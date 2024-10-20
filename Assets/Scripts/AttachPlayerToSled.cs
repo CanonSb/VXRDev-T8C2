@@ -29,20 +29,15 @@ public class AttachPlayerToSled : MonoBehaviour
 
     public void RecenterEasy()
     {
-        print("doing things");
+        print("Recentering");
         xrOrigin.MoveCameraToWorldLocation(target.position);
-        // xrOrigin.MatchOriginUpCameraForward(target.up, target.forward);
-        posReference.localPosition = Camera.main.transform.localPosition;
-
-        // xrOrigin.transform.position = target.position;
-        // print(Camera.main.transform.localPosition - target.localPosition);
-
+        xrOrigin.MatchOriginUpCameraForward(target.up, target.forward);
+        if (posReference) posReference.localPosition = Camera.main.transform.localPosition;
     }
 
     public void RecenterComplicated()
     {
-
-        print("doing things");
+        print("Recentering");
         Vector3 offset = head.position - xrOrigin.transform.position;
         offset.y = 0;
         xrOrigin.transform.position = target.position - offset;
@@ -55,6 +50,7 @@ public class AttachPlayerToSled : MonoBehaviour
         float angle = Vector3.SignedAngle(cameraForward, targetForward, Vector3.up);
 
         xrOrigin.transform.RotateAround(head.position, Vector3.up, angle);
-        posReference.localPosition = Camera.main.transform.localPosition;
+
+        if (posReference) posReference.localPosition = Camera.main.transform.localPosition;
     }
 }

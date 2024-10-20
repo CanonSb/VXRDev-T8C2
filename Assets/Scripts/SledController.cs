@@ -1,37 +1,46 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class SledController : MonoBehaviour
 {
     [Header("Sled Settings")]
     public float moveSpeed = 5f;
+    public float extraSpeedMult = 1f;
     public float rotationSpeed = 100f;
     public float maxTurnAngle = 45f;
-    public Transform sledCenter;
 
     [Header("Head Tracking")]
     public float posThreshold = 0.2f;
     public float rotThreshold = 15.0f;
+    public Transform camCenter;
 
+    private float sideLeanMagnitude;
+    private float forwardLeanMagnitude;
 
     private bool leaningRight, leaningLeft, leaningForward, leaningBack;
     private Quaternion initialSledRot;
     private Rigidbody rb;
+
     private float curMoveSpeed;
+
+    public AttachPlayerToSled attachToSled;
     
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         initialSledRot = rb.rotation;
+
+        // StartCoroutine(WaitAndRecenter());
     }
 
     void Update()
     {
         CaptureLeaning();
-        curMoveSpeed = leaningForward ? moveSpeed * 1.5f : moveSpeed;
+        curMoveSpeed = leaningForward ? moveSpeed * forwardLeanMagnitude * extraSpeedMult : moveSpeed;
     }
 
     void FixedUpdate()
@@ -44,31 +53,37 @@ public class SledController : MonoBehaviour
     
     private void CaptureLeaning()
     {
-        // Get the current head position (via the camera's local position)
+        // Get the current head position
         Vector3 currentHeadPosition = Camera.main.transform.localPosition;
-        Vector3 currentSledPosition = sledCenter.localPosition;
+        Vector3 currentSledPosition = camCenter.localPosition;
 
         // Calculate the head position compared to the sled position
         Vector3 headPosOffset = currentHeadPosition - currentSledPosition;
+
+        // print(headPosOffset.x);
 
         // Leaning Conditions w/ head rotation
         leaningRight = headPosOffset.x > posThreshold;
         leaningLeft = headPosOffset.x < -posThreshold;
         leaningForward = headPosOffset.z > posThreshold;
         leaningBack = headPosOffset.z < -posThreshold;
+
+
+        // Determine side lean magnitudes
+        float maxLeanOffset = 0.3f;
+        if (leaningRight) sideLeanMagnitude = Mathf.Clamp((headPosOffset.x - posThreshold) / maxLeanOffset, -1, 1);
+        if (leaningLeft) sideLeanMagnitude = Mathf.Clamp((headPosOffset.x + posThreshold) / maxLeanOffset, -1, 1);
+
+        if (leaningForward) forwardLeanMagnitude = Mathf.Clamp((headPosOffset.z - posThreshold) / maxLeanOffset + 1, 1, 2);
     }
 
-    
-    // TODO: Lerp the speed change and rotations based on the magnitude of the leaning
-    //       (Bigger leans = faster turning & faster speed)
 
     private void HandleTurning()
     {
         float yRotation = 0f;
 
         // Determine rotation based on leaning
-        if (leaningRight) yRotation = rotationSpeed * Time.fixedDeltaTime;
-        if (leaningLeft) yRotation = -rotationSpeed * Time.fixedDeltaTime;
+        if (leaningRight || leaningLeft) yRotation = rotationSpeed * sideLeanMagnitude * Time.fixedDeltaTime;
 
         // Calculate the new desired rotation
         Quaternion deltaRotation = Quaternion.Euler(0, yRotation, 0);
@@ -89,5 +104,12 @@ public class SledController : MonoBehaviour
 
         // Apply the clamped rotation
         rb.MoveRotation(Quaternion.Euler(newRotationEuler));
+    }
+
+
+    private IEnumerator WaitAndRecenter()
+    {
+        yield return new WaitForSeconds(1f);
+        attachToSled.RecenterEasy();
     }
 }

@@ -7,6 +7,7 @@ using UnityEngine;
 public class SledControllerV2 : MonoBehaviour
 {
     [Header("Sled Settings")]
+    public Rigidbody rb;
     public float moveSpeed = 5f;
     public float extraSpeedMult = 1f;
     public float rotationSpeed = 100f;
@@ -23,7 +24,6 @@ public class SledControllerV2 : MonoBehaviour
 
     private bool leaningRight, leaningLeft, leaningForward, leaningBack;
     private Quaternion initialSledRot;
-    private Rigidbody rb;
 
     private float curMoveSpeed;
 

@@ -30,7 +30,7 @@ public class MainMenuController : MonoBehaviour
         // Disable sign text
         GameObject.FindGameObjectWithTag("signText").SetActive(false);
         // Start the fog lerp coroutine and wait for it to finish
-        yield return StartCoroutine(LerpFogDensity(1f));
+        yield return StartCoroutine(LerpFogDensity(1f, 1.5f));
         SceneManager.LoadScene("Slope");
     }
 
@@ -38,6 +38,9 @@ public class MainMenuController : MonoBehaviour
     private IEnumerator LerpFogDensity(float endDensity, float duration = 1f)
     {
         float timeElapsed = 0f;
+
+        ColorUtility.TryParseHtmlString("#CDE2FF", out Color fogColor);
+        Color camStartColor = Camera.main.backgroundColor;
         float startDensity = RenderSettings.fogDensity;
 
         while (timeElapsed < duration)
@@ -45,11 +48,13 @@ public class MainMenuController : MonoBehaviour
             timeElapsed += Time.deltaTime;
             float normalizedTime = Mathf.Clamp01(timeElapsed / duration);
 
+            Camera.main.backgroundColor = Color.Lerp(camStartColor, fogColor, normalizedTime);
             RenderSettings.fogDensity = Mathf.Lerp(startDensity, endDensity, normalizedTime);
             yield return null;
         }
 
         // Ensure the final fog density is set
+        Camera.main.backgroundColor = fogColor;
         RenderSettings.fogDensity = endDensity;
     }
 }

@@ -8,6 +8,7 @@ TagManager:
   - xrOrigin
   - signText
   - Terrain
+  - Obstacle
   layers:
   - Default
   - TransparentFX

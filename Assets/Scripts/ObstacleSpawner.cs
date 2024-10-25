@@ -59,9 +59,9 @@ public class ObstacleSpawner : MonoBehaviour
             GameObject obstaclePrefab = obstaclePrefabs[Random.Range(0, obstaclePrefabs.Length)];
             if (obstaclePrefabs != null) {
                 // Adjust the rotation to match the terrain's angle
-                Quaternion spawnRotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
+
                 // Quaternion spawnRotation = CalculateSpawnRotation(spawnPosition);
-                GameObject spawnedObstacle = Instantiate(obstaclePrefab, spawnPosition, spawnRotation);
+                GameObject spawnedObstacle = Instantiate(obstaclePrefab, spawnPosition, obstaclePrefab.transform.rotation);
 
                 // Destroy obstacle after lifetime
                 Destroy(spawnedObstacle, obstacleLifetime);

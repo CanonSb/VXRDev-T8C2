@@ -1,8 +1,7 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class SledControllerV2 : MonoBehaviour
 {
@@ -19,14 +18,16 @@ public class SledControllerV2 : MonoBehaviour
     public Transform[] leftRefs;
     public Transform[] rightRefs;
 
+    // POther Variables
+    public UnityEvent gameLoss;
+
     private float sideLeanMagnitude;
     private float forwardLeanMagnitude;
-
     private bool leaningRight, leaningLeft, leaningForward, leaningBack;
     private Quaternion initialSledRot;
-
     private float curMoveSpeed;
 
+    [Header("Attachables")]
     public AttachPlayerToSled attachToSled;
     
     // Start is called before the first frame update
@@ -110,8 +111,6 @@ public class SledControllerV2 : MonoBehaviour
         attachToSled.RecenterEasy();
     }
 
-
-
     private float GetMinDistance(Vector3 headPosition, params Transform[] references)
     {
         float minDistance = float.MaxValue;
@@ -125,9 +124,22 @@ public class SledControllerV2 : MonoBehaviour
         }
         return minDistance; 
     }
-
     private float CalculateLeanMagnitude(float distance)
     {
         return Mathf.Clamp(1 - (distance / distThreshold), 0, 1);
+    }
+
+    // Trigger game loss if colliding with tagged obstacle
+    private void OnCollisionEnter(Collision obj)
+    {
+        if (obj.gameObject.CompareTag("Obstacle")) 
+        {
+            gameLoss?.Invoke();
+        }
+    }
+
+    public void temp()
+    {
+        print("collided with obstacle");
     }
 }

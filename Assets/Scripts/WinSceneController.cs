@@ -13,6 +13,10 @@ public class WinSceneController : MonoBehaviour
     {
         signText = GameObject.FindGameObjectWithTag("signText");
         signText.SetActive(false);
+
+        ColorUtility.TryParseHtmlString("#D7EEFF", out Color fogColor);
+        Camera.main.backgroundColor = fogColor;
+        RenderSettings.fogColor = fogColor;
         InitializeFog();
     }
 
@@ -39,7 +43,7 @@ public class WinSceneController : MonoBehaviour
         // Set fog to max then lerp it down to create nice transition
         float ogDensity = RenderSettings.fogDensity;
         RenderSettings.fogDensity = 1f;
-        StartCoroutine(LerpFogDensity(ogDensity, 1.5f));
+        StartCoroutine(LerpFogDensity("#A1CDFF", ogDensity, 1.5f));
         StartCoroutine(TurnSignOn(1.2f));
     }
 
@@ -54,16 +58,16 @@ public class WinSceneController : MonoBehaviour
         // Disable sign text
         GameObject.FindGameObjectWithTag("signText").SetActive(false);
         // Start the fog lerp coroutine and wait for it to finish
-        yield return StartCoroutine(LerpFogDensity(1f, 1.5f));
+        yield return StartCoroutine(LerpFogDensity("#D7EEFF", 1f, 1.5f));
         SceneManager.LoadScene(sceneName);
     }
 
     // Coroutine to lerp fog density
-    private IEnumerator LerpFogDensity(float endDensity, float duration = 1f)
+    private IEnumerator LerpFogDensity(string targetFogColor, float endDensity, float duration = 1f)
     {
         float timeElapsed = 0f;
 
-        ColorUtility.TryParseHtmlString("#D7EEFF", out Color fogColor);
+        ColorUtility.TryParseHtmlString(targetFogColor, out Color endfogColor);
         Color camStartColor = Camera.main.backgroundColor;
         float startDensity = RenderSettings.fogDensity;
         Color startColor = RenderSettings.fogColor;
@@ -73,14 +77,14 @@ public class WinSceneController : MonoBehaviour
             timeElapsed += Time.deltaTime;
             float normalizedTime = Mathf.Clamp01(timeElapsed / duration);
 
-            Camera.main.backgroundColor = Color.Lerp(camStartColor, fogColor, normalizedTime);
+            Camera.main.backgroundColor = Color.Lerp(camStartColor, endfogColor, normalizedTime);
             RenderSettings.fogDensity = Mathf.Lerp(startDensity, endDensity, normalizedTime);
-            RenderSettings.fogColor = Color.Lerp(startColor, fogColor, normalizedTime);
+            RenderSettings.fogColor = Color.Lerp(startColor, endfogColor, normalizedTime);
             yield return null;
         }
 
         // Ensure the final fog density is set
-        Camera.main.backgroundColor = fogColor;
+        Camera.main.backgroundColor = endfogColor;
         RenderSettings.fogDensity = endDensity;
     }
 }

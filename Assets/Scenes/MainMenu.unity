@@ -1515,6 +1515,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 623564664}
     m_Modifications:
+    - target: {fileID: 140581114188557789, guid: c5e34e82008c82d46a9d6fe33464f8bf, type: 3}
+      propertyPath: m_TreeBillboardDistance
+      value: 59
+      objectReference: {fileID: 0}
     - target: {fileID: 3667059262630045976, guid: c5e34e82008c82d46a9d6fe33464f8bf, type: 3}
       propertyPath: m_LocalPosition.x
       value: -469.15765

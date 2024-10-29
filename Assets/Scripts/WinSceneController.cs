@@ -6,9 +6,13 @@ using UnityEngine.SceneManagement;
 
 public class WinSceneController : MonoBehaviour
 {
+    private GameObject signText;
+
     // Start is called before the first frame update
     void Start()
     {
+        signText = GameObject.FindGameObjectWithTag("signText");
+        signText.SetActive(false);
         InitializeFog();
     }
 
@@ -29,6 +33,21 @@ public class WinSceneController : MonoBehaviour
         StartCoroutine(SwitchScenes("Slope"));
     }
 
+    
+    private void InitializeFog()
+    {
+        // Set fog to max then lerp it down to create nice transition
+        float ogDensity = RenderSettings.fogDensity;
+        RenderSettings.fogDensity = 1f;
+        StartCoroutine(LerpFogDensity(ogDensity, 1.5f));
+        StartCoroutine(TurnSignOn(1.2f));
+    }
+
+    private IEnumerator TurnSignOn(float sec)
+    {
+        yield return new WaitForSeconds(sec);
+        signText.SetActive(true);
+    }
 
     public IEnumerator SwitchScenes(string sceneName)
     {
@@ -63,13 +82,5 @@ public class WinSceneController : MonoBehaviour
         // Ensure the final fog density is set
         Camera.main.backgroundColor = fogColor;
         RenderSettings.fogDensity = endDensity;
-    }
-
-    private void InitializeFog()
-    {
-        // Set fog to max then lerp it down to create nice transition
-        float ogDensity = RenderSettings.fogDensity;
-        RenderSettings.fogDensity = 1f;
-        StartCoroutine(LerpFogDensity(ogDensity, 1.5f));
     }
 }

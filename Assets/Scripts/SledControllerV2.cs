@@ -51,7 +51,7 @@ public class SledControllerV2 : MonoBehaviour
             CaptureLeaning();
             curMoveSpeed = leaningForward ? moveSpeed * (1 + forwardLeanMagnitude) * extraSpeedMult : moveSpeed;
             // If going faster, pitch up sled audio by up to .2 depending on forwardleanmagnitude
-            sledAudioSource.pitch = leaningForward ? initialPitch + forwardLeanMagnitude * 0.4f : initialPitch;            
+            sledAudioSource.pitch = leaningForward ? initialPitch + forwardLeanMagnitude * 0.3f : initialPitch;            
         }
     }
 

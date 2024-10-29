@@ -24,7 +24,7 @@ public class GameController : MonoBehaviour
     }
     public void OnGameWin()
     {
-        LerpFogDensity(1f, 1f);
+        StartCoroutine(LerpFogDensity(1f, 1f));
         StartCoroutine(LoadScene("WinScene", 1f));
     }
 

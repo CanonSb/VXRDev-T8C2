@@ -1,8 +1,7 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class SledControllerV2 : MonoBehaviour
 {
@@ -19,36 +18,51 @@ public class SledControllerV2 : MonoBehaviour
     public Transform[] leftRefs;
     public Transform[] rightRefs;
 
+    [Header("Audio")]
+    public AudioSource sledAudioSource;
+    public AudioClip obstacleHitSound;
+    private float initialPitch;
+
+    [Header("Events")]
+    public UnityEvent gameLoss;
+    public UnityEvent gameWin;
+
     private float sideLeanMagnitude;
     private float forwardLeanMagnitude;
-
     private bool leaningRight, leaningLeft, leaningForward, leaningBack;
     private Quaternion initialSledRot;
-
     private float curMoveSpeed;
 
-    public AttachPlayerToSled attachToSled;
+    private bool alive = true;
+
     
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         initialSledRot = rb.rotation;
-
-        StartCoroutine(WaitAndRecenter());
+        initialPitch = sledAudioSource.pitch;
     }
 
     void Update()
     {
-        CaptureLeaning();
-        curMoveSpeed = leaningForward ? moveSpeed * (1 + forwardLeanMagnitude) * extraSpeedMult : moveSpeed;
+        if (alive)
+        {
+            CaptureLeaning();
+            curMoveSpeed = leaningForward ? moveSpeed * (1 + forwardLeanMagnitude) * extraSpeedMult : moveSpeed;
+            // If going faster, pitch up sled audio by up to .2 depending on forwardleanmagnitude
+            sledAudioSource.pitch = leaningForward ? initialPitch + forwardLeanMagnitude * 0.3f : initialPitch;            
+        }
     }
 
     void FixedUpdate()
     {
-        // Move the Rigidbody forward
-        rb.MovePosition(rb.position + transform.forward * curMoveSpeed * Time.fixedDeltaTime);
-        HandleTurning();
+        if (alive)
+        {
+            // Move the Rigidbody forward
+            rb.MovePosition(rb.position + transform.forward * curMoveSpeed * Time.fixedDeltaTime);
+            HandleTurning();
+        }
     }
 
     
@@ -103,15 +117,6 @@ public class SledControllerV2 : MonoBehaviour
         rb.MoveRotation(Quaternion.Euler(newRotationEuler));
     }
 
-
-    private IEnumerator WaitAndRecenter()
-    {
-        yield return new WaitForSeconds(1f);
-        attachToSled.RecenterEasy();
-    }
-
-
-
     private float GetMinDistance(Vector3 headPosition, params Transform[] references)
     {
         float minDistance = float.MaxValue;
@@ -125,9 +130,36 @@ public class SledControllerV2 : MonoBehaviour
         }
         return minDistance; 
     }
-
     private float CalculateLeanMagnitude(float distance)
     {
         return Mathf.Clamp(1 - (distance / distThreshold), 0, 1);
     }
+
+    // Trigger game loss if colliding with tagged obstacle
+    private void OnCollisionEnter(Collision obj)
+    {
+        if (alive && obj.gameObject.CompareTag("Obstacle")) 
+        {
+            alive = false;
+            playHitSound();
+            gameLoss?.Invoke();
+        }
+    }
+
+    private void OnTriggerEnter(Collider obj)
+    {
+        if (obj.CompareTag("WinTrigger"))
+        {
+            gameWin?.Invoke();
+        }
+    }
+
+    private void playHitSound()
+    {
+        sledAudioSource.Stop();
+        sledAudioSource.volume = 1f;
+        sledAudioSource.pitch = 1f;
+        sledAudioSource.PlayOneShot(obstacleHitSound);
+    }
+
 }

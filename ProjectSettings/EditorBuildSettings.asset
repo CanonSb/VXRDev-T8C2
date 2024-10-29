@@ -6,8 +6,14 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/MainMenu.unity
+    guid: cb10b55f537a9bb4e9db51261544bd19
+  - enabled: 1
     path: Assets/Scenes/Slope.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/Scenes/WinScene.unity
+    guid: f2451852d9ff4da4588afc6d6c7ce53d
   m_configObjects:
     com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: e4f0ced3539ec8e4a88290df18758909, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: bd0fbbc52d4030f408b215d2616a0e9a, type: 2}

@@ -48,7 +48,7 @@ Material:
     - _SnowScale: 1600
     - _VertexOffset: 0.018
     m_Colors:
-    - _SnowColor: {r: 1, g: 1, b: 1, a: 1}
+    - _SnowColor: {r: 0.7207546, g: 0.7207546, b: 0.7207546, a: 1}
   m_BuildTextureStacks: []
 --- !u!114 &2671178480745284873
 MonoBehaviour:

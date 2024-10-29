@@ -8,6 +8,8 @@ TagManager:
   - xrOrigin
   - signText
   - Terrain
+  - Obstacle
+  - WinTrigger
   layers:
   - Default
   - TransparentFX

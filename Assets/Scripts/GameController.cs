@@ -10,13 +10,30 @@ public class GameController : MonoBehaviour
 
     void Start()
     {
+        InitializeFog();
+
+        // Recenter player
+        StartCoroutine(WaitAndRecenter(1f));
+    }
+
+
+    public void OnGameLoss()
+    {
+        blackScreenPanel.SetActive(true);
+        StartCoroutine(LoadScene("MainMenu", 3f));
+    }
+    public void OnGameWin()
+    {
+        LerpFogDensity(1f, 1f);
+        StartCoroutine(LoadScene("WinScene", 1f));
+    }
+
+    private void InitializeFog()
+    {
         // Set fog to max then lerp it down to create nice transition
         float ogDensity = RenderSettings.fogDensity;
         RenderSettings.fogDensity = 1f;
-        StartCoroutine(LerpFogDensity(ogDensity));
-
-        // Recenter player
-        StartCoroutine(WaitAndRecenter(0.5f));
+        StartCoroutine(LerpFogDensity(ogDensity, 1.5f));
     }
 
     // Coroutine to lerp fog density
@@ -38,17 +55,10 @@ public class GameController : MonoBehaviour
         RenderSettings.fogDensity = endDensity;
     }
 
-
     private IEnumerator WaitAndRecenter(float sec)
     {
         yield return new WaitForSeconds(sec);
         attachToSled.RecenterEasy();
-    }
-
-    public void OnGameLoss()
-    {
-        blackScreenPanel.SetActive(true);
-        StartCoroutine(LoadScene("MainMenu", 3f));
     }
 
     private IEnumerator LoadScene(string sceneName, float sec)
@@ -56,5 +66,5 @@ public class GameController : MonoBehaviour
         yield return new WaitForSeconds(sec);
         SceneManager.LoadScene(sceneName);
     }
-    
+
 }

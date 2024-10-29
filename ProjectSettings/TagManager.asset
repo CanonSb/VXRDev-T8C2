@@ -9,6 +9,7 @@ TagManager:
   - signText
   - Terrain
   - Obstacle
+  - WinTrigger
   layers:
   - Default
   - TransparentFX

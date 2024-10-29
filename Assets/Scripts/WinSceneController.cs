@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
-public class MainMenuController : MonoBehaviour
+public class WinSceneController : MonoBehaviour
 {
     // Start is called before the first frame update
     void Start()
@@ -19,19 +19,24 @@ public class MainMenuController : MonoBehaviour
     }
 
 
-    public void StartGame()
+    public void GoToMainMenu()
     {
-        StartCoroutine(SwitchScenes());
+        StartCoroutine(SwitchScenes("MainMenu"));
+    }
+
+    public void RestartGame()
+    {
+        StartCoroutine(SwitchScenes("Slope"));
     }
 
 
-    public IEnumerator SwitchScenes()
+    public IEnumerator SwitchScenes(string sceneName)
     {
         // Disable sign text
         GameObject.FindGameObjectWithTag("signText").SetActive(false);
         // Start the fog lerp coroutine and wait for it to finish
         yield return StartCoroutine(LerpFogDensity(1f, 1.5f));
-        SceneManager.LoadScene("Slope");
+        SceneManager.LoadScene(sceneName);
     }
 
     // Coroutine to lerp fog density
@@ -42,6 +47,7 @@ public class MainMenuController : MonoBehaviour
         ColorUtility.TryParseHtmlString("#D7EEFF", out Color fogColor);
         Color camStartColor = Camera.main.backgroundColor;
         float startDensity = RenderSettings.fogDensity;
+        Color startColor = RenderSettings.fogColor;
 
         while (timeElapsed < duration)
         {
@@ -50,6 +56,7 @@ public class MainMenuController : MonoBehaviour
 
             Camera.main.backgroundColor = Color.Lerp(camStartColor, fogColor, normalizedTime);
             RenderSettings.fogDensity = Mathf.Lerp(startDensity, endDensity, normalizedTime);
+            RenderSettings.fogColor = Color.Lerp(startColor, fogColor, normalizedTime);
             yield return null;
         }
 

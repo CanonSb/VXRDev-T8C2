@@ -25,6 +25,7 @@ public class SledControllerV2 : MonoBehaviour
 
     [Header("Events")]
     public UnityEvent gameLoss;
+    public UnityEvent gameWin;
 
     private float sideLeanMagnitude;
     private float forwardLeanMagnitude;
@@ -142,6 +143,14 @@ public class SledControllerV2 : MonoBehaviour
             alive = false;
             playHitSound();
             gameLoss?.Invoke();
+        }
+    }
+
+    private void OnTriggerEnter(Collider obj)
+    {
+        if (obj.CompareTag("WinTrigger"))
+        {
+            gameWin?.Invoke();
         }
     }
 
